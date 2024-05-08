@@ -16,6 +16,7 @@ import (
 
 	"github.com/influxdata/telegraf"
 	"github.com/influxdata/telegraf/config"
+	//"github.com/influxdata/telegraf/internal"
 	"github.com/influxdata/telegraf/plugins/common/kafka"
 	"github.com/influxdata/telegraf/plugins/inputs"
 )
@@ -94,6 +95,8 @@ func (*KafkaConsumer) SampleConfig() string {
 }
 
 func (k *KafkaConsumer) SetParser(parser telegraf.Parser) {
+fmt.Printf("!!!!!!!!!!!setParser:")
+	fmt.Println(parser)
 	k.parser = parser
 }
 
@@ -346,7 +349,7 @@ func (k *KafkaConsumer) Start(acc telegraf.Accumulator) error {
 			err := k.consumer.Consume(ctx, topics, handler)
 			if err != nil {
 				acc.AddError(fmt.Errorf("consume: %w", err))
-				// internal.SleepContext(ctx, reconnectDelay) //nolint:errcheck // ignore returned error as we cannot do anything about it anyway
+				//internal.SleepContext(ctx, reconnectDelay) //nolint:errcheck // ignore returned error as we cannot do anything about it anyway
 			}
 		}
 		err = k.consumer.Close()
@@ -384,6 +387,8 @@ type Message struct {
 }
 
 func NewConsumerGroupHandler(acc telegraf.Accumulator, maxUndelivered int, parser telegraf.Parser, log telegraf.Logger) *ConsumerGroupHandler {
+	fmt.Printf("!!!!!!!!!!!NewConsumerGroupHandler:")
+	fmt.Println(parser)
 	handler := &ConsumerGroupHandler{
 		acc:         acc.WithTracking(maxUndelivered),
 		sem:         make(chan empty, maxUndelivered),
@@ -483,7 +488,8 @@ func (h *ConsumerGroupHandler) Handle(session sarama.ConsumerGroupSession, msg *
 		return fmt.Errorf("message exceeds max_message_len (actual %d, max %d)",
 			len(msg.Value), h.MaxMessageLen)
 	}
-
+	fmt.Printf("!!!!!!!!!!!handle:")
+	fmt.Println(h.parser)
 	metrics, err := h.parser.Parse(msg.Value)
 	if err != nil {
 		session.MarkMessage(msg, "")
