@@ -16,7 +16,6 @@ import (
 
 	"github.com/influxdata/telegraf"
 	"github.com/influxdata/telegraf/config"
-	// "github.com/influxdata/telegraf/internal"
 	"github.com/influxdata/telegraf/plugins/common/kafka"
 	"github.com/influxdata/telegraf/plugins/inputs"
 )
@@ -347,7 +346,7 @@ func (k *KafkaConsumer) Start(acc telegraf.Accumulator) error {
 			err := k.consumer.Consume(ctx, topics, handler)
 			if err != nil {
 				acc.AddError(fmt.Errorf("consume: %w", err))
-				internal.SleepContext(ctx, reconnectDelay) //nolint:errcheck // ignore returned error as we cannot do anything about it anyway
+				// internal.SleepContext(ctx, reconnectDelay) //nolint:errcheck // ignore returned error as we cannot do anything about it anyway
 			}
 		}
 		err = k.consumer.Close()
